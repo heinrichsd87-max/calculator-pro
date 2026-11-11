@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator Pro - Black Edition</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #000000;
+    color: white;
+    transition: 0.3s;
+}
+
+
+.app {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    gap: 15px !important;
+    background: #080808;
+    border: 1px solid #292929;
+    padding: 22px;
+    border-radius: 25px;
+    box-shadow: 0 0 45px #ffffff0c;
+}
+
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: 21px;
+    letter-spacing: 1px;
+}
+
+.header button {
+    background: #171717;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+}
+
+.tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    padding: 5px;
+    background: #111;
+    border: 1px solid #292929;
+    border-radius: 30px;
+    margin-bottom: 20px;
+}
+
+.tabs button {
+    background: transparent;
+    border: none;
+    color: #999;
+    padding: 12px 3px;
+    border-radius: 25px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.tabs button.active {
+    background: #292929;
+    color: white;
+    box-shadow: 0 0 12px #ffffff25;
+}
+
+.display {
+    background: #050505;
+    border: 1px solid #292929;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 20px;
+    min-height: 125px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+#expression {
+    text-align: right;
+    color: #777;
+    font-size: 15px;
+    min-height: 20px;
+    overflow-wrap: anywhere;
+}
+
+#display {
+    background: transparent;
+    color: white;
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 42px;
+    text-align: right;
+    margin-top: 12px;
+    font-weight: 300;
+}
+
+.section-title {
+    font-size: 11px;
+    color: #777;
+    letter-spacing: 2px;
+    margin: 15px 0 10px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+button.key {
+    height: 62px;
+    border-radius: 13px;
+    border: 1px solid #292929;
+    background: linear-gradient(145deg, #202020, #090909);
+    color: white;
+    font-size: 21px;
+    cursor: pointer;
+    transition: 0.15s;
+    box-shadow: 0 3px 8px #000;
+}
+
+button.key:hover {
+    background: #333;
+    border-color: #777;
+    box-shadow: 0 0 12px #ffffff25;
+}
+
+button.key:active {
+    transform: scale(0.94);
+    background: #444;
+}
+
+.operator {
+    color: #ddd !important;
+    background: #303030 !important;
+}
+
+.clear {
+    color: #ff5555 !important;
+}
+
+.equal {
+    grid-column: span 2;
+    background: linear-gradient(145deg, #eeeeee, #888888) !important;
+    color: #000 !important;
+    border: none !important;
+    font-weight: bold;
+}
+
+.zero {
+    grid-column: span 2;
+}
+
+.scientific {
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+    margin-bottom: 15px;
+}
+
+.scientific.visible {
+    display: grid;
+}
+
+.scientific button {
+    height: 48px;
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.history {
+    display: none;
+    margin-top: 15px;
+    border-top: 1px solid #292929;
+    padding-top: 15px;
+}
+
+.history.visible {
+    display: block;
+}
+
+.history-entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid #222;
+    font-size: 13px;
+    cursor: pointer;
+    gap: 10px;
+}
+
+.history-entry span:last-child {
+    color: #fff;
+    font-weight: bold;
+}
+
+.history-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.history-actions button {
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#historyList {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+body.light {
+    background: #eeeeee;
+    color: #111;
+}
+
+body.light .app {
+    background: #fff;
+    border-color: #ccc;
+}
+
+body.light .display {
+    background: #f1f1f1;
+    border-color: #ddd;
+}
+
+body.light #display {
+    color: #111;
+}
+
+body.light button.key {
+    background: #e5e5e5;
+    color: #111;
+    border-color: #ccc;
+}
+
+body.light .operator {
+    background: #d0d0d0 !important;
+    color: #111 !important;
+}
+
+body.light .scientific button,
+body.light .tabs,
+body.light .header button {
+    background: #eee;
+    color: #111;
+}
+
+body.light .tabs button {
+    color: #444;
+}
+
+body.light .tabs button.active {
+    background: #ccc;
+}
+
+body.light .history-entry {
+    border-color: #ddd;
+}
+
+@media(max-width: 380px) {
+    .app {
+        padding: 15px;
+    }
+
+    button.key {
+        height: 55px;
+    }
+}
+
+/* Taschenrechner mittig */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.app {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* Großer Verlauf */
+.history {
+    width: 100%;
+    min-height: 350px;
+    padding: 22px;
+    background: #080808;
+    border: 1px solid #333;
+    border-radius: 18px;
+}
+
+.history-actions {
+    font-size: 21px;
+    padding-bottom: 15px;
+}
+
+.history-entry {
+    padding: 22px 16px;
+    margin: 12px 0;
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 14px;
+    font-size: 18px;
+}
+
+.history-entry span:last-child {
+    font-size: 23px;
+    color: white;
+}
+
+#historyList {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+
+/* APP KOMPLETT ZENTRIEREN */
+body {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.app {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: auto !important;
+}
+
+.app > * {
+    width: 100%;
+}
+
+/* Anzeige und Tasten untereinander */
+.display {
+    width: 100%;
+}
+
+.buttons {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Verlauf groß und mittig */
+.history {
+    width: 100%;
+    min-height: 400px;
+    padding: 25px;
+    margin-top: 20px;
+    background: #080808;
+    border: 1px solid #333;
+    border-radius: 18px;
+}
+
+.history-entry {
+    width: 100%;
+    min-height: 75px;
+    padding: 20px;
+    margin: 12px 0;
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 14px;
+}
+
+.history-entry span {
+    font-size: 18px;
+}
+
+.history-entry span:last-child {
+    font-size: 24px;
+}
+
+#historyList {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+
+/* FINAL LAYOUT - ALLES UNTEREINANDER */
+
+body {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    padding: 30px 15px !important;
+}
+
+.app {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    gap: 15px !important;
+}
+
+/* Alle Bereiche untereinander */
+.app > .header,
+.app > .tabs,
+.app > .display,
+.app > .scientific,
+.app > .buttons,
+.app > .history {
+    width: 100% !important;
+    flex: none !important;
+}
+
+/* Anzeige über den Tasten */
+.app > .display {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    min-height: 140px !important;
+    padding: 22px !important;
+}
+
+/* Ergebnis rechts anzeigen */
+#expression {
+    text-align: right !important;
+}
+
+#display {
+    text-align: right !important;
+    width: 100% !important;
+    font-size: 42px !important;
+}
+
+/* Wissenschaftliche Zeichen über C und DEL */
+.app > .scientific {
+    display: none;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+}
+
+.app > .scientific.visible {
+    display: grid !important;
+}
+
+.app > .scientific button {
+    width: 100% !important;
+    min-height: 48px !important;
+}
+
+/* Normale Zahlentasten */
+.app > .buttons {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+}
+
+.app > .buttons button {
+    width: 100% !important;
+}
+
+/* Verlauf */
+.app > .history {
+    display: none;
+    min-height: 350px !important;
+}
+
+.app > .history.visible {
+    display: block !important;
+}
+
+@media(max-width: 400px) {
+    .app {
+        max-width: 100% !important;
+    }
+
+    .app > .buttons {
+        gap: 7px !important;
+    }
+}
+
+
+/* EINSPALTIGES LAYOUT ERZWINGEN */
+
+.app {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-auto-flow: row !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    gap: 14px !important;
+}
+
+.app > * {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+.app > .header {
+    grid-row: 1;
+}
+
+.app > .tabs {
+    grid-row: 2;
+}
+
+.app > .display {
+    grid-row: 3;
+    min-height: 150px !important;
+}
+
+.app > .scientific.visible {
+    grid-row: 4;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+}
+
+.app > .buttons {
+    grid-row: 5;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+}
+
+.app > .history.visible {
+    grid-row: 3;
+    display: block !important;
+}
+
+body {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+}
+
+@media (max-width: 500px) {
+    .app {
+        max-width: 100% !important;
+    }
+}
+body {
+    outline: 5px solid red !important;
+}
+
+/* FINALES LAYOUT */
+.app {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    gap: 15px !important;
+}
+
+.app > .header,
+.app > .tabs,
+.app > .display,
+.app > .scientific,
+.app > .buttons,
+.app > .history {
+    width: 100% !important;
+    flex: none !important;
+}
+
+.app > .display {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.app > .scientific {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+
+.app > .buttons {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Calculator Pro">
+</style>
+</head>
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Calculator Pro">
+
+</head>
+<body>
+
+<div class="app">
+
+    <div class="header">
+        <h1>◈ Calculator Pro</h1>
+        <button onclick="toggleTheme()">◐</button>
+    </div>
+
+   <div class="tabs">
+        <button class="active" onclick="showTab('standard',this)">Standard</button>
+        <button onclick="showTab('scientific',this)">Wissenschaft</button>
+        <button onclick="showTab('history',this)">Verlauf</button>
+    </div>
+
+  
+<div class="display" id="displayArea">
+
+    <div id="expression">
+        Bereit zum Rechnen
+    </div>
+
+    <input id="display" value="0" readonly>
+
+</div>
+
+
+    <div class="scientific" id="scientific">
+        <button onclick="scientific('sqrt')">√</button>
+        <button onclick="scientific('square')">x²</button>
+        <button onclick="scientific('sin')">sin</button>
+        <button onclick="scientific('cos')">cos</button>
+        <button onclick="scientific('tan')">tan</button>
+        <button onclick="scientific('percent')">%</button>
+        <button onclick="scientific('pi')">π</button>
+        <button onclick="add('(')">(</button>
+    </div>
+
+    <div class="buttons" id="buttons">
+
+        <button class="key clear" onclick="clearDisplay()">C</button>
+        <button class="key" onclick="deleteNumber()">DEL</button>
+        <button class="key operator" onclick="add('(')">(</button>
+        <button class="key operator" onclick="add('/')">÷</button>
+
+        <button class="key" onclick="add('7')">7</button>
+        <button class="key" onclick="add('8')">8</button>
+        <button class="key" onclick="add('9')">9</button>
+        <button class="key operator" onclick="add('*')">×</button>
+
+        <button class="key" onclick="add('4')">4</button>
+        <button class="key" onclick="add('5')">5</button>
+        <button class="key" onclick="add('6')">6</button>
+        <button class="key operator" onclick="add('-')">−</button>
+
+        <button class="key" onclick="add('1')">1</button>
+        <button class="key" onclick="add('2')">2</button>
+        <button class="key" onclick="add('3')">3</button>
+        <button class="key operator" onclick="add('+')">+</button>
+
+        <button class="key zero" onclick="add('0')">0</button>
+        <button class="key" onclick="add('.')">.</button>
+        <button class="key equal" onclick="calculate()">=</button>
+
+    </div>
+
+    <div class="history" id="history">
+        <div class="history-actions">
+            <strong>Rechenverlauf</strong>
+            <button onclick="clearHistory()">Löschen</button>
+        </div>
+        <div id="historyList"></div>
+    </div>
+
+</div>
+
+<script>
+const display = document.getElementById("display");
+const expression = document.getElementById("expression");
+
+let current = "0";
+let justCalculated = false;
+
+function update() {
+    display.value = current;
+}
+
+function add(value) {
+
+    if (current === "Fehler") current = "0";
+
+    if (justCalculated && /[0-9.(]/.test(value)) {
+        current = "0";
+    }
+
+    justCalculated = false;
+
+    if (current === "0" && /^[0-9]$/.test(value)) {
+        current = value;
+    } else {
+        current += value;
+    }
+
+    update();
+}
+
+function clearDisplay() {
+    current = "0";
+    justCalculated = false;
+    expression.textContent = "Bereit zum Rechnen";
+    update();
+}
+
+function deleteNumber() {
+    current = current.slice(0,-1) || "0";
+    justCalculated = false;
+    update();
+}
+
+function calculate() {
+    try {
+        if (!/^[0-9+\-*/().\s]+$/.test(current)) {
+            throw new Error();
+        }
+
+        const result = Function(
+            '"use strict"; return (' + current + ')'
+        )();
+
+        if (!Number.isFinite(result)) throw new Error();
+
+        const old = current;
+        current = String(Number(result.toPrecision(12)));
+
+        expression.textContent = old + " =";
+
+        saveHistory(old,current);
+
+        justCalculated = true;
+        update();
+
+    } catch {
+        current = "Fehler";
+        update();
+        justCalculated = true;
+    }
+}
+
+function scientific(type) {
+
+    let number = Number(current);
+    let result;
+
+    switch(type) {
+        case "sqrt":
+            result = Math.sqrt(number);
+            break;
+
+        case "square":
+            result = number ** 2;
+            break;
+
+        case "sin":
+            result = Math.sin(number * Math.PI / 180);
+            break;
+
+        case "cos":
+            result = Math.cos(number * Math.PI / 180);
+            break;
+
+        case "tan":
+            result = Math.tan(number * Math.PI / 180);
+            break;
+
+        case "percent":
+            result = number / 100;
+            break;
+
+        case "pi":
+            result = Math.PI;
+            break;
+    }
+
+    if (!Number.isFinite(result)) {
+        current = "Fehler";
+    } else {
+        expression.textContent = type + "(" + current + ")";
+        current = String(Number(result.toPrecision(12)));
+    }
+
+    justCalculated = true;
+    update();
+}
+
+// Verlauf
+
+function getHistory() {
+    return JSON.parse(
+        localStorage.getItem("calculatorHistory") || "[]"
+    );
+}
+
+function saveHistory(input,result) {
+
+    let history = getHistory();
+
+    history.unshift({input,result});
+    history = history.slice(0,20);
+
+    localStorage.setItem(
+        "calculatorHistory",
+        JSON.stringify(history)
+    );
+
+    renderHistory();
+}
+
+function renderHistory() {
+
+    const list = document.getElementById("historyList");
+    list.innerHTML = "";
+
+    getHistory().forEach(item => {
+
+        const entry = document.createElement("div");
+        entry.className = "history-entry";
+
+        const left = document.createElement("span");
+        left.textContent = item.input + " =";
+
+        const right = document.createElement("span");
+        right.textContent = item.result;
+
+        entry.append(left,right);
+
+        entry.onclick = () => {
+            current = String(item.result);
+            justCalculated = true;
+            update();
+        };
+
+        list.appendChild(entry);
+    });
+}
+
+function clearHistory() {
+    localStorage.removeItem("calculatorHistory");
+    renderHistory();
+}
+
+// Modus wechseln
+
+
+
+function showTab(tab, button) {
+
+    document.querySelectorAll(".tabs button")
+        .forEach(b => b.classList.remove("active"));
+
+    button.classList.add("active");
+
+    const displayArea = document.getElementById("displayArea");
+    const scientific = document.getElementById("scientific");
+    const history = document.getElementById("history");
+    const buttons = document.getElementById("buttons");
+
+    // Alles ausblenden
+    displayArea.style.display = "none";
+    scientific.classList.remove("visible");
+    history.classList.remove("visible");
+    buttons.style.display = "none";
+
+    if (tab === "standard") {
+        displayArea.style.display = "flex";
+        buttons.style.display = "grid";
+    }
+
+    else if (tab === "scientific") {
+        displayArea.style.display = "flex";
+        scientific.classList.add("visible");
+        buttons.style.display = "grid";
+    }
+
+    else if (tab === "history") {
+        history.classList.add("visible");
+        renderHistory();
+    }
+}
+
+
+// Design wechseln
+
+function toggleTheme() {
+
+    document.body.classList.toggle("light");
+
+    localStorage.setItem(
+        "calculatorTheme",
+        document.body.classList.contains("light")
+            ? "light"
+            : "dark"
+    );
+}
+
+// Tastatur
+
+document.addEventListener("keydown",event => {
+
+    if (/^[0-9.+\-*/()]$/.test(event.key)) {
+        add(event.key);
+    }
+
+    if (event.key === "Enter") calculate();
+    if (event.key === "Backspace") deleteNumber();
+    if (event.key === "Escape") clearDisplay();
+});
+
+// Einstellungen laden
+
+if (localStorage.getItem("calculatorTheme") === "light") {
+    document.body.classList.add("light");
+}
+
+renderHistory();
+update();
+
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js");
+    });
+}
+</script>
+</body>
+</html>
+
+
+
+
+
